@@ -1,0 +1,364 @@
+<ion-header *ngIf="ionicForm.controls.po_status.value === '4'">
+  <ion-toolbar>
+    <ion-title>เลขที่ {{ ionicForm.controls.po_running.value}}</ion-title>
+    <ion-buttons slot="primary" *ngIf="modepayment === null">
+      <ion-button (click)="submitForm_Payment()">
+        <ion-icon slot="icon-only" src="./assets/icons/save.svg"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="ionicForm.controls.po_status.value === '4'">  
+  <!-- *ngIf="ionicForm.controls.po_status.value === '4'" -->
+    <form [formGroup]="ionicFormPayment" novalidate>
+      <ion-grid >
+        <div class="table1">
+        <ion-row>
+          <ion-col>การรับสินค้า</ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col> 
+            <ion-item>
+              <ion-label class="showlabel" position="floating">วันที่ส่ง</ion-label>
+              <ion-input formControlName="payment_date" readonly  type="text"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col> 
+            <ion-item>
+              <ion-label class="showlabel" position="floating">เงินที่ต้องชำระ</ion-label>
+              <ion-input formControlName="moneypay" type="text" readonly></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col >
+            <ion-item>
+              <ion-label class="showlabel" position="floating" >วิธีการรับเงิน</ion-label>
+              <ionic-selectable
+                interface="floating"
+                item-content
+                formControlName="typepayment"
+                itemValueField="id"
+                itemTextField="typeserch"
+                [items]="ports_payment"
+                [canSearch]="true" 
+                closeButtonText="ยกเลิก"
+                (onChange)="portChange_payment($event)"
+                >
+              </ionic-selectable>
+              <span class="error" *ngIf="isSubmitted && errorControl_Payment.typepayment.errors?.required">
+                กรุณาระบุ วิธีการรับเงิน
+              </span>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="paymenttype === 0">
+          <ion-col>
+            <ion-item>
+              <ion-label class="showlabel" position="floating">รับเงิน</ion-label> 
+              <ion-input formControlName="cashmoney_0" type="tel"  (input)="cul_cashmoney_0($event.target.value)" ></ion-input>
+              <span class="error" *ngIf="isSubmitted && errorControl_Payment.cashmoney_0.errors?.required">
+                กรุณาระบุ รับเงิน
+              </span>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-label class="showlabel" position="floating">เงินทอน</ion-label>
+              <ion-input formControlName="change_0" type="text" readonly></ion-input>
+              <span class="error" *ngIf="isSubmitted && errorControl_Payment.change_0.errors?.min">
+                เงินทอน ไม่ควรเป็นค่าติดลบ
+              </span>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <div *ngIf="paymenttype === 1">
+          <ion-row *ngIf="showrowpaymenttype1 === true">
+            <ion-col>
+               <ion-img id="img2" [src]="src"></ion-img>
+           </ion-col>
+         </ion-row>
+         <ion-row>
+          <ion-col>
+            <p>แนบสลิปการโอน 
+              <input type="file" (change)="fileUpload_imgpayment($event)" id="file-input" accept="image/x-png,image/jpeg"  style="position:absolute; top: -999999px" #fileIngimg1>
+              <button ion-button (click)="fileUpload_payment()">Upload</button>
+              <div>
+             <div  style="display: inline-block;" *ngFor="let img of picpreview" >
+              <ion-img style="width: 100px; height: 100px;"  [src]="img.url"></ion-img>
+              <ion-button (click)="delImg_payment(img.id)">
+                <ion-icon slot="icon-only" size="small" name="trash"></ion-icon>
+              </ion-button>
+             </div>
+            </div>
+          <p>
+            <span class="error" *ngIf="isSubmitted && errorControl_Payment.picresizbase64List.errors?.required">
+              กรุณาแนบ สลิปการโอน
+            </span>
+          </ion-col>
+         </ion-row>
+        </div>
+        
+        <ion-row *ngIf="paymenttype === 2">
+          <ion-col>
+            <ion-item>
+              <ion-label class="showlabel" position="floating">เลข EMS</ion-label>
+              <ion-input formControlName="ems_2" type="text"></ion-input>
+              <span class="error" *ngIf="isSubmitted && errorControl_Payment.ems_2.errors?.required">
+                กรุณาระบุ เลข EMS
+              </span>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="paymenttype === 3">
+          <ion-col>
+            <ion-item>
+              <ion-label class="showlabel" position="floating">สาเหตุที่ยกเลิก</ion-label>
+              <ion-input formControlName="payment_cancel_3" type="text"></ion-input>
+              <span class="error" *ngIf="isSubmitted && errorControl_Payment.payment_cancel_3.errors?.required">
+                กรุณาระบุ สาเหตุที่ยกเลิก
+              </span>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="paymenttype === 4">
+          <ion-col>
+            <ion-item>
+              <ion-label class="showlabel" position="floating">ปัญหา</ion-label>
+              <ion-input formControlName="problem_cause_4" type="text"></ion-input>
+              <span class="error" *ngIf="isSubmitted && errorControl_Payment.problem_cause_4.errors?.required">
+                กรุณาระบุ ปัญหา
+              </span>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        </div>
+      </ion-grid>
+    </form>
+
+  <form [formGroup]="ionicForm" novalidate>
+    <ion-grid >
+      <div class="table1">
+        <ion-row>
+          <ion-col >
+            <ion-item>
+              <ion-label class="showlabel" position="floating">วันที่สั่งซื้อ</ion-label>
+              <ion-input type="text" formControlName="po_date" readonly></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col >
+            <ion-item>
+              <ion-label class="showlabel" position="floating">ผู้ขาย</ion-label>
+              <ion-input type="text" formControlName="nickname" readonly></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+                <ion-label class="showlabel" position="floating">ชื่อวิน</ion-label>
+                <ion-input formControlName="po_namewin" type="text" readonly></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col > 
+              <ion-item>
+                <ion-label class="showlabel" position="floating">เขต</ion-label>
+                <ion-input formControlName="area_name" type="text" readonly></ion-input>
+              </ion-item>
+            </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-label class="showlabel" position="floating">ประเภทลูกค้า</ion-label>
+              <ion-input formControlName="po_customertype" type="text" readonly></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col >
+            <ion-item>
+              <ion-label class="showlabel" position="floating">ชื่อลูกค้า</ion-label>
+              <ion-input formControlName="po_customer" type="text" readonly></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col >
+            <ion-item>
+              <ion-label class="showlabel" position="floating">เบอร์ลูกค้า</ion-label>
+              <ion-input formControlName="po_customer_tel" type="text" readonly></ion-input>  
+            </ion-item>
+          </ion-col>
+          <ion-col >
+            <ion-item>
+              <ion-label class="showlabel" position="floating">วันที่นัดรับ</ion-label>
+              <ion-input formControlName="po_recivedate" type="text" readonly></ion-input> 
+            </ion-item>
+          </ion-col> 
+        </ion-row>
+        <ion-row>
+       
+          <ion-col>
+            <ion-item>
+              <ion-label class="showlabel" position="floating">ค่ามัดจำ</ion-label>
+              <ion-input formControlName="po_deposit" type="number" readonly></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col >
+            <ion-item>
+              <ion-label class="showlabel" position="floating">การส่งสินค้า</ion-label>
+              <ion-input formControlName="shipping_name" type="text" readonly></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row> 
+          <ion-col >
+            <ion-item>
+              <ion-label class="showlabel" position="floating">ราคาค่าส่ง</ion-label>
+              <ion-input formControlName="po_shipping_price" type="number" readonly></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col > 
+            <ion-item>
+              <ion-label class="showlabel" position="floating">สถานที่ส่ง (บ้านเลขที่ ซอย ถนน)</ion-label>
+              <ion-input formControlName="po_address" type="text" readonly></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item>
+              <ion-label class="showlabel" position="floating">สถานที่ส่ง ( แขวง/ตำบล เขต/อำเภอ จังหวัด รหัสไปรษณีย์)</ion-label>
+              <ion-input formControlName="po_address_place" type="text" readonly></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row> 
+          <ion-col >
+            <ion-item>
+              <ion-label class="showlabel" position="floating" >ประเภทใบสั่งซื้อ</ion-label>
+              <ion-input formControlName="po_green" type="text" readonly></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col>
+            <ion-item>
+              <ion-label class="showlabel" position="floating">เงื่อนไขป้ายเขียว</ion-label>
+              <ion-input formControlName="namewin_comment" type="text" readonly></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </div>
+      <p></p>
+      <div class="table1">
+        <ion-row  class="table1_header" *ngIf="tmpproduct.length>0">
+          <ion-col size="0.5">#</ion-col>
+          <ion-col size="4">สินค้า/ขนาด/ราคา</ion-col>
+          <ion-col size="2">ส่วนลด</ion-col>
+          <ion-col size="2">ราคารวม</ion-col>
+          <ion-col size="3">หมายเหตุ</ion-col>
+        </ion-row>
+        <!-- <ion-row class="table1_detail" *ngFor="let c of tmpproduct;let i = index;">  ng-class-even="'blue'" ng-class-odd="'green'" -->
+          <ion-row  *ngFor="let c of tmpproduct;let i = index; " [ngClass]="(i % 2 == 0) ? 'table1_detail_odd' : 'table1_detail_even'">  
+          <ion-col  size="0.5">{{i+1}}</ion-col>
+          <ion-col size="4">{{c.name}}</ion-col>
+          <ion-col size="2"> 
+          <ion-input  class="showborder" type="number"  [(ngModel)]="discount[c.id]" [ngModelOptions]="{standalone: true}" readonly></ion-input> 
+          </ion-col>
+          <ion-col size="2">{{c.total|number}}</ion-col>
+          <ion-col size="3.5"> 
+            <ion-input  class="showborder" type="text"  [(ngModel)]="commentproduct[c.id]" [ngModelOptions]="{standalone: true}" readonly></ion-input> 
+          </ion-col>   
+            <ion-col size="12" *ngIf="c.numbervalue !== null">
+              <div>
+              <ion-row *ngIf="c.numbervalue !== null">
+                <ion-col  size="auto">เลขเสื้อเบอร์ {{c.numbervalue.podetail_number}}</ion-col>
+                <ion-col  size="auto">ด้านหน้าสี {{c.numbervalue.color_front}}</ion-col>
+                <ion-col  size="auto">ด้านหลังสี {{c.numbervalue.color_back}}</ion-col>
+              </ion-row>
+            </div>
+            </ion-col>
+            <ion-col size="12" *ngIf="c.notnumber === true">
+              <ion-col  size="auto"> ไม่ปักตัวเลข</ion-col>
+            </ion-col>
+            <ion-col size="12" *ngIf="isSubmitted && this.ionicForm.controls.po_green.value.id === 0 && c.numbervalue === null && c.notnumber === false">
+              <ion-row >
+                <span class="error" >
+                 สินค้าลำดับที่ {{i+1}}  กรุณาระบุเบอร์เสื้อ
+                </span>
+              </ion-row>
+            </ion-col>
+            <ion-col size="12" *ngIf="c.productetc !== null">
+              <div>
+                <ion-row>
+                  <ion-text color="primary">
+                   สินค้าอื่นๆ ของลำดับที่ {{i+1}}
+                  </ion-text>
+                </ion-row>
+              <ion-row *ngFor="let cc of c.productetc.tmpproductetc;let ii = index;">
+                <ion-col size="1"> {{ii+1}}</ion-col> 
+                <ion-col size="2"> {{cc.name}}</ion-col>
+                <ion-col size="2"> {{cc.discount}}</ion-col>
+                <ion-col size="2"> {{cc.total}}</ion-col> 
+                <ion-col size="3"> {{cc.commentproduct}}</ion-col>
+              </ion-row>
+              </div>
+            </ion-col>
+            <ion-col size="12" *ngIf="c.picresizbase64List.length > 0">
+              <div>
+                <ion-row>
+                  <ion-text color="primary">
+                  ภาพประกอบ ของลำดับที่ {{i+1}}
+                  </ion-text>
+                </ion-row>
+                <div  >
+                  <div  style="display: inline-block;" *ngFor="let img of c.picresizbase64List" >
+                   <ion-img style="width: 100px; height: 100px;"  [src]="img.urlresize"></ion-img>
+                   <ion-button *ngIf="img.detail_id !== undefined" (click)="showImg(img.detail_id,img.name)">
+                    <ion-icon slot="icon-only" size="small" name="search"></ion-icon>
+                  </ion-button>
+                  </div>
+                 </div>
+              </div>
+            </ion-col>
+        </ion-row> 
+        <ion-row class="table1_footer" *ngIf="tmpproduct.length>0">
+          <!-- <ion-col  size="1"></ion-col> -->
+          <ion-col  size="3">รวมราคาสินค้า</ion-col>
+          <ion-col  size="2">{{allDiscount|number}}</ion-col>
+          <ion-col  size="2">{{alltotalproduct|number}}</ion-col>
+        </ion-row>
+        <ion-row class="table1_footer" *ngIf="tmpproduct.length>0">
+          <ion-col  size="3">รวมค่าขนส่ง</ion-col>
+          <ion-col  size="2"></ion-col>
+          <ion-col  size="2">{{po_shipping_price|number}}</ion-col>
+        </ion-row>
+        <ion-row class="table1_footer" *ngIf="tmpproduct.length>0">
+          <ion-col  size="3">รวมราคาทั้งหมด</ion-col>
+          <ion-col  size="2"></ion-col>
+          <ion-col  size="2">{{alltotal|number}}</ion-col>
+        </ion-row>
+        <ion-row class="table1_footer" *ngIf="tmpproduct.length>0">
+          <ion-col  size="3">หักค่ามัดจำ</ion-col>
+          <ion-col  size="2"></ion-col>
+          <ion-col  size="2">{{ionicForm.controls['po_deposit'].value|number}}</ion-col>
+        </ion-row>
+        <ion-row class="table1_footer" *ngIf="tmpproduct.length>0">
+          <ion-col  size="3">รวมสุทธิ</ion-col>
+          <ion-col  size="2"></ion-col>
+          <ion-col  size="2">{{alltotal-ionicForm.controls['po_deposit'].value|number}}</ion-col>
+        </ion-row>
+      </div>
+      <ion-row>
+        <ion-label class="appversion"> App Version : {{versionNumber}} </ion-label>
+      </ion-row>
+    </ion-grid>
+  </form>
+</ion-content>
+
+ <ion-content *ngIf="ionicForm.controls.po_status.value !== '4'">
+  <span class="error">ERROR</span> 
+
+</ion-content> 
+
